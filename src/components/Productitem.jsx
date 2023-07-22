@@ -1,15 +1,6 @@
 import styled from "styled-components";
 import React, { useState } from "react";
 
-// const Articulo = styled.h1`
-//   font-weight: bold;
-//   border-top: 2px solid red;
-//   border-bottom: 2px solid red;
-//   padding-top: 5px;
-//   padding-bottom: 5px;
-//   border-width: 2px;
-// `;
-
 const Container = styled.div`
   display: flex;
   margin: 10px;
@@ -49,10 +40,23 @@ const Desc = styled.div`
   font-size: 16px;
 `;
 
+const Descrip = styled.div`
+  flex: 1;
+  font-size: 16px;
+`;
+
+const Titulo = styled.div`
+  flex: 1;
+  font-size: 16px;
+  font-weight: bold;
+`;
+
 const Precio = styled.p`
   font-size: 18px;
   font-weight: bold;
   margin-bottom: 1px;
+  text-align: center;
+  margin-right: 45px;
 `;
 
 const Button = styled.button`
@@ -80,13 +84,14 @@ const Productitem = ({ item }) => {
   return (
     <Container>
       <Image
-        src={item.img}
+        src={item.imagen}
         isExpanded={isExpanded}
         onClick={handleImageClick}
       />
       <Desc>
-        {item.desc}
-        <Precio>{item.precio}</Precio>
+        <Titulo>{item.titulo}.</Titulo>
+        <Descrip>{item.descr}.</Descrip>
+        <Precio>${item.precio}</Precio>
         <Button>AGREGAR</Button>
       </Desc>
     </Container>

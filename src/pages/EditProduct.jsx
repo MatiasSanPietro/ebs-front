@@ -96,13 +96,16 @@ const EditProduct = () => {
         </Form.Group>
         <Form.Group className="mb-3" controlId="formBasicEmail">
           <Form.Label>Rubro</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Insertar rubro"
+          <Form.Select
             name="rubro"
             value={rubro}
             onChange={(e) => handleChange(e.target.name, e.target.value)}
-          />
+          >
+            <option value="">Elegir rubro</option>
+            <option value="comida">Comida</option>
+            <option value="bebida">Bebida</option>
+            <option value="promo">Promo</option>
+          </Form.Select>
         </Form.Group>
         <Button variant="primary" type="submit" className="mb-3">
           Enviar

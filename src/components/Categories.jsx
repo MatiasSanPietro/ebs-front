@@ -12,10 +12,21 @@ const Container = styled.div`
 `;
 
 const Categories = () => {
+  const handleButtonClick = (id) => {
+    const sectionElement = document.getElementById(`${id}-section`);
+    if (sectionElement) {
+      sectionElement.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <Container>
       {categories.map((item) => (
-        <Categoryitem item={item} key={item.id} />
+        <Categoryitem
+          key={item.id}
+          item={item}
+          onClick={() => handleButtonClick(item.title.toLowerCase())}
+        />
       ))}
     </Container>
   );

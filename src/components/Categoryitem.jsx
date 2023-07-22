@@ -29,18 +29,6 @@ const Info = styled.div`
   justify-content: center;
 `;
 
-// const Title = styled.h1`
-//   font-size: 25px;
-//   color: darkgrey;
-//   text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black,
-//     1px 1px 0 black;
-//   margin-bottom: 5px;
-//   position: absolute;
-//   top: 0;
-//   padding-bottom: 50px;
-//   background-color: #ededed;
-// `;
-
 const Button = styled.button`
   font-weight: bold;
   font-size: 15px;
@@ -64,12 +52,12 @@ const Button = styled.button`
   transition: all 0.1s ease;
 `;
 
-const Categoryitem = ({ item }) => {
+const Categoryitem = ({ item, onClick }) => {
   return (
     <Container>
       <Image src={item.img} />
       <Info>
-        <Button>{item.title}</Button>
+        <Button onClick={onClick}>{item.title}</Button>
       </Info>
     </Container>
   );

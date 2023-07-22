@@ -173,7 +173,7 @@ const Summary = styled.div`
   border: 0.5px solid lightgray;
   border-radius: 10px;
   padding: 20px;
-  height: 55vh;
+  height: 80vh;
 `;
 
 const SummaryTitle = styled.h1`
@@ -223,6 +223,8 @@ const Button = styled.button`
 
 const State = styled.div`
   padding: 2px;
+  padding-top: 10px;
+  padding-bottom: 10px;
 `;
 
 const Cart = () => {
@@ -244,10 +246,6 @@ const Cart = () => {
         <Bottom>
           <Info>
             <TopText>CARRITO (2)</TopText>
-            <BottomText>
-              <b>Direccion:</b> Calle falsa 312
-              <ButtonAdress>Cambiar direccion</ButtonAdress>
-            </BottomText>
             <Product>
               <ProductDetail>
                 <Image src="https://i.imgur.com/KXI1Cf2.jpg" />
@@ -310,13 +308,17 @@ const Cart = () => {
               <SummaryItemText>Total</SummaryItemText>
               <SummaryItemPrice>$ 80</SummaryItemPrice>
             </SummaryItem>
+            <State>
+              <b>Direccion:</b> Calle falsa 312
+              <ButtonAdress>Cambiar direccion</ButtonAdress>
+            </State>
             <label htmlFor="payment">Método de Pago:</label>
             <select
               id="payment"
               value={paymentMethod}
               onChange={handlePaymentChange}
             >
-              <option value="efectivo">EFECTIVO</option>
+              <option value="efectivo">Efectivo</option>
             </select>
             <Button>COMPRAR AHORA</Button>
             <State>ESTADO PEDIDO: -</State>

@@ -1,18 +1,21 @@
 export const categories = [
   {
     id: 1,
-    img: "https://i.imgur.com/oJMvgJ5.jpg",
-    title: "PROMOS INDIVIDUALES",
+    img: "https://i.imgur.com/KXI1Cf2.jpg",
+    title: "PROMOS",
+    descr: "promo",
   },
   {
     id: 2,
-    img: "https://i.imgur.com/KXI1Cf2.jpg",
-    title: "PROMOS PARA COMPARTIR",
+    img: "https://i.imgur.com/BILNPB0.jpg",
+    title: "COMIDAS",
+    descr: "comida",
   },
   {
     id: 3,
-    img: "https://i.imgur.com/V7kG9sZ.jpg",
+    img: "https://i.imgur.com/HlV1i1l.jpg",
     title: "BEBIDAS",
+    descr: "bebida",
   },
 ];
 
