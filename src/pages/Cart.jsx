@@ -24,46 +24,9 @@ const Title = styled.h1`
   border-bottom: 2px solid red;
 `;
 
-const Top = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px;
-`;
-
-const TopButton = styled.button`
-  padding: 10px;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 15px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border: none;
-  background-color: white;
-  color: black;
-  cursor: pointer;
-  text-align: center;
-  border-top: 2px solid red;
-  border-bottom: 2px solid red;
-  &:hover {
-    color: red;
-    text-weight: bold;
-    background-color: lightgrey;
-    border-top: 2px solid red;
-    border-bottom: 2px solid red;
-  }
-  transition: all 0.05s ease;
-`;
-
 const TopText = styled.span`
   text-decoration: underline;
   cursor: pointer;
-  margin-left: 15px;
-`;
-
-const BottomText = styled.p`
-  font-size: 18px;
   margin-left: 15px;
 `;
 
@@ -234,9 +197,9 @@ const Cart = () => {
     setPaymentMethod(event.target.value);
   };
 
-  const handleCheckout = () => {
-    // Lógica para realizar el checkout
-  };
+  // const handleCheckout = () => {
+  //   // Lógica para realizar el checkout
+  // };
 
   return (
     <Container>

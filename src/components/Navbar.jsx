@@ -1,26 +1,10 @@
 import { Badge } from "@material-ui/core";
 import { ShoppingCartOutlined, Search } from "@material-ui/icons";
-import React from "react";
+import React, { useContext } from "react";
 import styled from "styled-components";
 import { mobile } from "../responsive";
-import { Link, useNavigate } from "react-router-dom";
-// import { Container, Nav, Navbar } from "react-bootstrap";
-
-// const Navigation = () => {
-//   return (
-//     <Navbar bg="primary" variant="dark">
-//       <Container>
-//         <Navbar.Brand href="#home">Musical Hendrix</Navbar.Brand>
-//         <Nav className="me-auto">
-//           <Nav.Link href="/">Home</Nav.Link>
-//           <Nav.Link href="/location">Donde estamos</Nav.Link>
-//           <Nav.Link href="/list/">Productos</Nav.Link>
-//           <Nav.Link href="/grilla-productos/">Grilla</Nav.Link>
-//         </Nav>
-//       </Container>
-//     </Navbar>
-//   );
-// };
+import { Link } from "react-router-dom";
+import { UserContext } from "../context/UserContext";
 
 const Container = styled.div`
   height: 65px;
@@ -67,20 +51,6 @@ const StyledLinkLogo = styled(Link)`
   text-decoration: none;
   font-size: 2rem;
   ${mobile({ fontSize: "24px" })}
-`;
-
-const MenuItem = styled.div`
-  font-size: 25x;
-  cursor: pointer;
-  margin-left: 20px;
-  &:hover {
-    color: red;
-    background-color: #ededed;
-    border-top: 2px solid red;
-    border-bottom: 2px solid red;
-  }
-  transition: all 0.05s ease;
-  ${mobile({ fontSize: "12px", marginLeft: "10px" })}
 `;
 
 const Right = styled.div`
@@ -130,7 +100,18 @@ const Input = styled.input`
   ${mobile({ width: "50px" })}
 `;
 
+const Username = styled.div`
+  font-size: 20px;
+`;
+
 const Navbar = () => {
+  const { user, setUser } = useContext(UserContext);
+
+  const handleLogout = () => {
+    // Lógica para cerrar sesión
+    setUser(null);
+  };
+
   return (
     <Container>
       <Wrapper>
@@ -140,15 +121,39 @@ const Navbar = () => {
             <Search style={{ color: "gray", fontSize: 20 }} />
             <Input placeholder="BUSCAR PRODUCTOS" />
           </SearchContainer>
-          <StyledLinkMenuItem to="/grid">GRILLA</StyledLinkMenuItem>
-          <StyledLinkMenuItem to="/orders">PEDIDOS</StyledLinkMenuItem>
+          {user && (
+            <>
+              <StyledLinkMenuItem to="/grid">GRILLA</StyledLinkMenuItem>
+              <StyledLinkMenuItem to="/orders">PEDIDOS</StyledLinkMenuItem>
+            </>
+          )}
         </Left>
         <Center>
           <StyledLinkLogo to="/">EL BUEN SABOR</StyledLinkLogo>
         </Center>
         <Right>
-          <StyledLinkMenuItem to="/register">REGISTRARSE</StyledLinkMenuItem>
-          <StyledLinkMenuItem to="/login">INICIAR SESION</StyledLinkMenuItem>
+          {user ? (
+            <>
+              <Username>¡Hola {user.nombre}!</Username>
+              {user.rol === "admin" && (
+                <>
+                  <StyledLinkMenuItem /*to="/admin"*/>ADMIN</StyledLinkMenuItem>
+                </>
+              )}
+              <StyledLinkMenuItem onClick={handleLogout}>
+                CERRAR SESIÓN
+              </StyledLinkMenuItem>
+            </>
+          ) : (
+            <>
+              <StyledLinkMenuItem to="/register">
+                REGISTRARSE
+              </StyledLinkMenuItem>
+              <StyledLinkMenuItem to="/login">
+                INICIAR SESION
+              </StyledLinkMenuItem>
+            </>
+          )}
           <StyledLinkMenuItem to="/Cart">
             <Badge overlap="rectangular" badgeContent={1} color="primary">
               <ShoppingCartOutlined />

@@ -3,9 +3,9 @@ import { mobile } from "../responsive";
 import React from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { registerUser } from "../service/auth";
 
 const Container = styled.div`
   width: 100vw;
@@ -77,10 +77,12 @@ const Button = styled.button`
 
 const Register = () => {
   const [inputs, setInputs] = useState({
-    username: "",
-    email: "",
-    password: "",
+    nombre: "",
+    mail: "",
+    contraseña: "",
+    telefono: "",
   });
+  const [errors, setErrors] = useState({});
   const [err, setError] = useState(null);
 
   const navigate = useNavigate();
@@ -91,8 +93,29 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Realizar validación de campos vacíos
+    const validationErrors = {};
+    if (!inputs.nombre.trim()) {
+      validationErrors.nombre = "El nombre es obligatorio.";
+    }
+    if (!inputs.mail.trim()) {
+      validationErrors.mail = "El mail es obligatorio.";
+    }
+    if (!inputs.contraseña.trim()) {
+      validationErrors.contraseña = "La contraseña es obligatoria.";
+    }
+    if (!inputs.telefono.trim()) {
+      validationErrors.telefono = "El telefono es obligatorio.";
+    }
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
     try {
-      await axios.post("/auth/register", inputs);
+      await registerUser(inputs);
       navigate("/login");
     } catch (err) {
       setError(err.response.data);
@@ -106,14 +129,41 @@ const Register = () => {
         <Wrapper>
           <Title>CREAR UNA CUENTA</Title>
           <Form>
-            <Input placeholder="NOMBRE" />
-            <Input placeholder="APELLIDO" />
-            <Input placeholder="TELEFONO" />
-            <Input placeholder="EMAIL" />
-            <Input placeholder="CONTRASEÑA" />
-            <Input placeholder="CONFIRMAR CONTRASEÑA" />
-            <Button>CREAR</Button>
+            <Input
+              required
+              type="text"
+              name="nombre"
+              onChange={handleChange}
+              placeholder="NOMBRE"
+            />
+            <Input
+              required
+              type="text"
+              name="telefono"
+              onChange={handleChange}
+              placeholder="TELEFONO"
+            />
+            <Input
+              required
+              type="text"
+              name="mail"
+              onChange={handleChange}
+              placeholder="EMAIL"
+            />
+            <Input
+              required
+              type="password"
+              name="contraseña"
+              onChange={handleChange}
+              placeholder="CONTRASEÑA"
+            />
+            <Button onClick={handleSubmit}>CREAR</Button>
           </Form>
+          <p style={{ color: "red" }}>{errors.nombre}</p>
+          <p style={{ color: "red" }}>{errors.telefono}</p>
+          <p style={{ color: "red" }}>{errors.mail}</p>
+          <p style={{ color: "red" }}>{errors.contraseña}</p>
+          {err && <p style={{ color: "red" }}>{err}</p>}
           <Link to="/login">Ya tienes una cuenta?</Link>
         </Wrapper>
       </Container>
