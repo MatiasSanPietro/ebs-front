@@ -5,15 +5,10 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Grid from "./pages/Grid";
 import Orders from "./pages/Orders";
-// import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import AddProduct from "./pages/AddProduct";
 import EditProduct from "./pages/EditProduct";
 import { UserProvider } from "./context/UserContext";
-
-// const App = () => {
-//   return <Home />;
-// };
 
 function App() {
   return (
@@ -33,50 +28,5 @@ function App() {
     </UserProvider>
   );
 }
-
-// const router = createBrowserRouter([
-//   {
-//     path: "/",
-//     element: <Home />,
-//   },
-//   {
-//     path: "/login",
-//     element: <Login />,
-//   },
-//   {
-//     path: "/register",
-//     element: <Register />,
-//   },
-//   {
-//     path: "/cart",
-//     element: <Cart />,
-//   },
-//   {
-//     path: "/grid",
-//     element: <Grid />,
-//   },
-//   {
-//     path: "/orders",
-//     element: <Orders />,
-//   },
-//   {
-//     path: "/agregar-producto",
-//     element: <AddProduct />,
-//   },
-//   {
-//     path: "/grilla-productos/:idProduct",
-//     element: <EditProduct />,
-//   },
-// ]);
-
-// function App() {
-//   return (
-//     <div className="app">
-//       <div className="container">
-//         <RouterProvider router={router} />
-//       </div>
-//     </div>
-//   );
-// }
 
 export default App;

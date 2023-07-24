@@ -13,14 +13,13 @@ const Left = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 20px;
+  padding-left: 20px;
+  padding-top: 20px;
 `;
 
 const Logo = styled.h1``;
 
-const Desc = styled.p`
-  margin: 20px 0px;
-`;
+const Desc = styled.p``;
 
 const Center = styled.div`
   flex: 1;
@@ -63,10 +62,11 @@ const Footer = () => {
       <Left>
         <Logo>EL BUEN SABOR</Logo>
         <Desc>
-          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Aut
-          dignissimos itaque in placeat id explicabo nostrum quaerat nisi qui!
-          Dicta molestias sint maiores repudiandae, delectus accusamus sapiente
-          facere odit libero?
+          Saborea la exquisitez en cada bocado. Descubre nuestra amplia variedad
+          de platos cuidadosamente preparados con los ingredientes más frescos y
+          seleccionados, deleitando tu paladar con una experiencia culinaria
+          única. ¡Pide ya y vive una experiencia gastronómica inolvidable con El
+          Buen Sabor!
         </Desc>
       </Left>
       <Center>

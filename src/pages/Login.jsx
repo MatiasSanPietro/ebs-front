@@ -126,7 +126,7 @@ const Login = () => {
       setUser(response);
 
       // Redirigir a otra página después del inicio de sesión exitoso
-      navigate("/"); // Cambia "/dashboard" por la ruta que desees
+      navigate("/");
     } catch (err) {
       setError(err.response.data);
     }

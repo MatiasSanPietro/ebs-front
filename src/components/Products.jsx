@@ -44,7 +44,7 @@ const Products = () => {
       });
   }, [mounted]);
 
-  // Filter products based on their "rubro" value
+  // Filtro pasado en "rubro"
   const comidas = products.filter((item) => item.rubro === "comida");
   const bebidas = products.filter((item) => item.rubro === "bebida");
   const promos = products.filter((item) => item.rubro === "promo");

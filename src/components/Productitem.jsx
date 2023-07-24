@@ -1,5 +1,6 @@
 import styled from "styled-components";
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { CartContext } from "../context/CartContext";
 
 const Container = styled.div`
   display: flex;
@@ -77,10 +78,16 @@ const Button = styled.button`
 
 const Productitem = ({ item }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const { addToCart } = useContext(CartContext);
 
   const handleImageClick = () => {
     setIsExpanded(!isExpanded);
   };
+
+  const handleAddToCart = () => {
+    addToCart(item);
+  };
+
   return (
     <Container>
       <Image
@@ -92,7 +99,7 @@ const Productitem = ({ item }) => {
         <Titulo>{item.titulo}.</Titulo>
         <Descrip>{item.descr}.</Descrip>
         <Precio>${item.precio}</Precio>
-        <Button>AGREGAR</Button>
+        <Button onClick={handleAddToCart}>AGREGAR</Button>
       </Desc>
     </Container>
   );

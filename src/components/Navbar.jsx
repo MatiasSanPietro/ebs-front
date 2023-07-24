@@ -1,5 +1,5 @@
 import { Badge } from "@material-ui/core";
-import { ShoppingCartOutlined, Search } from "@material-ui/icons";
+import { ShoppingCartOutlined } from "@material-ui/icons"; //Search
 import React, { useContext } from "react";
 import styled from "styled-components";
 import { mobile } from "../responsive";
@@ -86,21 +86,38 @@ const StyledLinkMenuItem = styled(Link)`
   ${mobile({ fontSize: "12px", marginLeft: "10px" })}
 `;
 
-const SearchContainer = styled.div`
-  border: 0px solid lightgray;
-  display: flex;
-  align-items: center;
-  margin-left: 25px;
-  margin-right: 2px;
-  padding: 5px;
+const StyledLinkMenuItemA = styled(Link)`
+  text-decoration: none;
+  font-size: 20px;
+  margin-left: 20px;
+  color: red;
+  background-color: #ededed;
+  border-top: 2px solid red;
+  border-bottom: 2px solid red;
+  ${mobile({ fontSize: "12px", marginLeft: "10px" })}
 `;
 
-const Input = styled.input`
-  border: none;
-  ${mobile({ width: "50px" })}
-`;
+// const SearchContainer = styled.div`
+//   border: 0px solid lightgray;
+//   display: flex;
+//   align-items: center;
+//   margin-left: 25px;
+//   margin-right: 2px;
+//   padding: 5px;
+// `;
+
+// const Input = styled.input`
+//   border: none;
+//   ${mobile({ width: "50px" })}
+// `;
 
 const Username = styled.div`
+  font-size: 20px;
+`;
+
+const Frase = styled.div`
+  padding-left: 20px;
+  padding-right: 5px;
   font-size: 20px;
 `;
 
@@ -117,10 +134,11 @@ const Navbar = () => {
       <Wrapper>
         <Left>
           <Language>ES</Language>
-          <SearchContainer>
+          <Frase>¡Descubre el sabor auténtico!</Frase>
+          {/* <SearchContainer>
             <Search style={{ color: "gray", fontSize: 20 }} />
             <Input placeholder="BUSCAR PRODUCTOS" />
-          </SearchContainer>
+          </SearchContainer> */}
           {user && (
             <>
               <StyledLinkMenuItem to="/grid">GRILLA</StyledLinkMenuItem>
@@ -137,7 +155,9 @@ const Navbar = () => {
               <Username>¡Hola {user.nombre}!</Username>
               {user.rol === "admin" && (
                 <>
-                  <StyledLinkMenuItem /*to="/admin"*/>ADMIN</StyledLinkMenuItem>
+                  <StyledLinkMenuItemA /*to="/admin"*/>
+                    ADMIN
+                  </StyledLinkMenuItemA>
                 </>
               )}
               <StyledLinkMenuItem onClick={handleLogout}>
@@ -155,7 +175,7 @@ const Navbar = () => {
             </>
           )}
           <StyledLinkMenuItem to="/Cart">
-            <Badge overlap="rectangular" badgeContent={1} color="primary">
+            <Badge overlap="rectangular" badgeContent={null} color="primary">
               <ShoppingCartOutlined />
             </Badge>
           </StyledLinkMenuItem>

@@ -3,7 +3,7 @@ import styled from "styled-components";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import { mobile } from "../responsive";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const Container = styled.div``;
 
@@ -25,34 +25,19 @@ const Title = styled.h1`
 `;
 
 const TopText = styled.span`
-  text-decoration: underline;
-  cursor: pointer;
   margin-left: 15px;
 `;
 
 const ButtonAdress = styled.button`
-  padding: 1px;
-  font-weight: 500;
-  cursor: pointer;
-  font-size: 16px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  background: none;
   border: none;
-  background-color: #ededed;
-  color: black;
+  padding: 10;
+  font-size: inherit;
+  font-family: inherit;
+  color: inherit;
+  font-weight: bold;
+  text-decoration: underline;
   cursor: pointer;
-  text-align: center;
-  border-top: 2px solid red;
-  border-bottom: 2px solid red;
-  &:hover {
-    color: red;
-    text-weight: bold;
-    background-color: lightgrey;
-    border-top: 2px solid red;
-    border-bottom: 2px solid red;
-  }
-  transition: all 0.05s ease;
 `;
 
 const Bottom = styled.div`
@@ -84,6 +69,7 @@ const Image = styled.img`
   object-fit: contain;
   margin: 10px;
   box-shadow: 0 0 5px 0px grey;
+  border-radius: 10px;
 `;
 
 const Details = styled.div`
@@ -95,7 +81,7 @@ const Details = styled.div`
 
 const ProductName = styled.span``;
 
-const ProductId = styled.span``;
+const ProductDescr = styled.span``;
 
 const PriceDetail = styled.div`
   flex: 1;
@@ -125,18 +111,13 @@ const ProductPrice = styled.div`
   ${mobile({ marginBottom: "20px" })}
 `;
 
-const Hr = styled.hr`
-  border: none;
-  height: 1px;
-`;
-
 const Summary = styled.div`
   flex: 1;
   background-color: white;
   border: 0.5px solid lightgray;
   border-radius: 10px;
   padding: 20px;
-  height: 80vh;
+  height: 72vh;
 `;
 
 const SummaryTitle = styled.h1`
@@ -184,22 +165,123 @@ const Button = styled.button`
   transition: all 0.05s ease;
 `;
 
+const ButtonClear = styled.button`
+  border: none;
+  color: red;
+  text-weight: bold;
+  background-color: lightgrey;
+  border-top: 2px solid red;
+  border-bottom: 2px solid red;
+  margin-top: 10px;
+`;
+
 const State = styled.div`
-  padding: 2px;
-  padding-top: 10px;
-  padding-bottom: 10px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+`;
+
+const StyledRemove = styled(Remove)`
+  cursor: pointer;
+`;
+
+const StyledAdd = styled(Add)`
+  cursor: pointer;
 `;
 
 const Cart = () => {
   const [paymentMethod, setPaymentMethod] = useState("");
+  const [cartItems, setCartItems] = useState([]);
 
   const handlePaymentChange = (event) => {
     setPaymentMethod(event.target.value);
   };
 
-  // const handleCheckout = () => {
-  //   // Lógica para realizar el checkout
+  // const addToCart = (product) => {
+  //   setCartItems((prevCartItems) => [...prevCartItems, product]);
+  //   localStorage.setItem("cartItems", JSON.stringify([...cartItems, product]));
   // };
+
+  useEffect(() => {
+    const storedCartItems = localStorage.getItem("cartItems");
+    if (storedCartItems) {
+      setCartItems(JSON.parse(storedCartItems));
+    }
+  }, []);
+
+  const calculateSubtotal = () => {
+    return cartItems.reduce(
+      (acc, item) => acc + item.precio * item.quantity,
+      0
+    );
+  };
+
+  const calculateTotal = () => {
+    return calculateSubtotal() + 50;
+  };
+
+  // Función para eliminar todos los elementos del carrito del localStorage
+  const clearCart = () => {
+    // Eliminar el ítem "cartItems" del localStorage
+    localStorage.removeItem("cartItems");
+
+    // Actualizar el estado del carrito para que quede vacío
+    setCartItems([]);
+  };
+
+  const increaseQuantity = (productId) => {
+    // Buscar el producto en el carrito con el id proporcionado
+    const productIndex = cartItems.findIndex((item) => item.id === productId);
+
+    if (productIndex !== -1) {
+      // Clonar el arreglo de cartItems para no modificar el estado directamente
+      const updatedCartItems = [...cartItems];
+
+      // Aumentar la cantidad del producto en 1
+      updatedCartItems[productIndex].quantity += 1;
+
+      // Actualizar el estado del carrito con la nueva cantidad del producto
+      setCartItems(updatedCartItems);
+
+      // Actualizar el localStorage para reflejar los cambios
+      localStorage.setItem("cartItems", JSON.stringify(updatedCartItems));
+    }
+  };
+
+  const decreaseQuantity = (productId) => {
+    // Buscar el producto en el carrito con el id proporcionado
+    const productIndex = cartItems.findIndex((item) => item.id === productId);
+
+    if (productIndex !== -1) {
+      // Clonar el arreglo de cartItems para no modificar el estado directamente
+      const updatedCartItems = [...cartItems];
+
+      // Disminuir la cantidad del producto en 1
+      updatedCartItems[productIndex].quantity -= 1;
+
+      // Si la cantidad del producto llega a 0, eliminar completamente el producto del carrito
+      if (updatedCartItems[productIndex].quantity === 0) {
+        updatedCartItems.splice(productIndex, 1);
+
+        // Verificar si el carrito está vacío y recargar la página
+        if (updatedCartItems.length === 0) {
+          setCartItems([]); // Actualizamos el carrito con un arreglo vacío
+          localStorage.removeItem("cartItems");
+          window.location.reload(); // Recargar la página
+          return;
+        }
+      }
+
+      // Actualizar el estado del carrito con los cambios realizados
+      setCartItems(updatedCartItems);
+
+      // Actualizar el localStorage para reflejar los cambios
+      localStorage.setItem("cartItems", JSON.stringify(updatedCartItems));
+    }
+  };
+
+  const calculateTotalQuantity = () => {
+    return cartItems.reduce((total, item) => total + item.quantity, 0);
+  };
 
   return (
     <Container>
@@ -208,74 +290,59 @@ const Cart = () => {
         <Title>TU COMPRA</Title>
         <Bottom>
           <Info>
-            <TopText>CARRITO (2)</TopText>
-            <Product>
-              <ProductDetail>
-                <Image src="https://i.imgur.com/KXI1Cf2.jpg" />
-                <Details>
-                  <ProductName>
-                    <b>PRODUCTO:</b> 2 hamburguesas con papas
-                  </ProductName>
-                  <ProductId>
-                    <b>ID:</b> 93813718293
-                  </ProductId>
-                </Details>
-              </ProductDetail>
-              <PriceDetail>
-                <ProductAmountContainer>
-                  <Add />
-                  <ProductAmount>2</ProductAmount>
-                  <Remove />
-                </ProductAmountContainer>
-                <ProductPrice>$ 30</ProductPrice>
-              </PriceDetail>
-            </Product>
-            <Hr />
-            <Product>
-              <ProductDetail>
-                <Image src="https://i.imgur.com/pCBKeWv.jpg" />
-                <Details>
-                  <ProductName>
-                    <b>PRODUCTO:</b> Cerveza andes
-                  </ProductName>
-                  <ProductId>
-                    <b>ID:</b> 93813718293
-                  </ProductId>
-                </Details>
-              </ProductDetail>
-              <PriceDetail>
-                <ProductAmountContainer>
-                  <Add />
-                  <ProductAmount>1</ProductAmount>
-                  <Remove />
-                </ProductAmountContainer>
-                <ProductPrice>$ 20</ProductPrice>
-              </PriceDetail>
-            </Product>
+            <TopText>
+              CARRITO: ({calculateTotalQuantity()} productos en total)
+            </TopText>
+            {cartItems.map((item) => (
+              <Product key={item.id}>
+                <ProductDetail>
+                  <Image src={item.imagen} />
+                  <Details>
+                    <ProductName>
+                      <b>{item.titulo}</b>
+                    </ProductName>
+                    <ProductDescr>
+                      <b>Detalles: </b>
+                      {item.descr}
+                    </ProductDescr>
+                  </Details>
+                </ProductDetail>
+                <PriceDetail>
+                  <ProductAmountContainer>
+                    <StyledRemove onClick={() => decreaseQuantity(item.id)} />
+                    <ProductAmount>({item.quantity})</ProductAmount>
+                    <StyledAdd onClick={() => increaseQuantity(item.id)} />
+                  </ProductAmountContainer>
+                  <ProductPrice>${item.precio * item.quantity}</ProductPrice>
+                </PriceDetail>
+              </Product>
+            ))}
           </Info>
           <Summary>
             <SummaryTitle>RESUMEN</SummaryTitle>
             <SummaryItem>
               <SummaryItemText>Subtotal</SummaryItemText>
-              <SummaryItemPrice>$ 80</SummaryItemPrice>
+              <SummaryItemPrice>${calculateSubtotal()}</SummaryItemPrice>
             </SummaryItem>
             <SummaryItem>
               <SummaryItemText>Envio</SummaryItemText>
-              <SummaryItemPrice>$ 5.90</SummaryItemPrice>
+              <SummaryItemPrice>$50</SummaryItemPrice>
             </SummaryItem>
             <SummaryItem>
-              <SummaryItemText>Descuento</SummaryItemText>
-              <SummaryItemPrice>$ -5.90</SummaryItemPrice>
-            </SummaryItem>
-            <SummaryItem type="total">
               <SummaryItemText>Total</SummaryItemText>
-              <SummaryItemPrice>$ 80</SummaryItemPrice>
+              <SummaryItemPrice>${calculateTotal()}</SummaryItemPrice>
             </SummaryItem>
-            <State>
-              <b>Direccion:</b> Calle falsa 312
-              <ButtonAdress>Cambiar direccion</ButtonAdress>
-            </State>
-            <label htmlFor="payment">Método de Pago:</label>
+            <label
+              htmlFor="payment"
+              style={{
+                fontWeight: "bold",
+                margintop: "10px",
+                marginbottom: "10px",
+              }}
+            >
+              Método de Pago:
+            </label>
+            &nbsp;&nbsp;
             <select
               id="payment"
               value={paymentMethod}
@@ -283,10 +350,21 @@ const Cart = () => {
             >
               <option value="efectivo">Efectivo</option>
             </select>
+            <State>
+              <b>Direccion:</b> Calle falsa 312
+              <ButtonAdress>Cambiar</ButtonAdress>
+            </State>
+            <State>
+              <b>Usuario:</b>
+            </State>
+            <State>
+              <b>Telefono:</b>
+            </State>
             <Button>COMPRAR AHORA</Button>
-            <State>ESTADO PEDIDO: -</State>
+            <State>ESTADO PEDIDO: ---</State>
           </Summary>
         </Bottom>
+        <ButtonClear onClick={clearCart}>Vaciar Carrito</ButtonClear>
       </Wrapper>
       <Footer />
     </Container>
