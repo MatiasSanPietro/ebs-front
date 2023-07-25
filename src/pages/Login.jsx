@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Footer from "../components/Footer";
 import { loginUser } from "../service/auth";
 import { UserContext } from "../context/UserContext";
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 
 const Container = styled.div`
   width: 100vw;
@@ -125,12 +125,24 @@ const Login = () => {
       console.log(response);
       setUser(response);
 
+      // Guardar la información del usuario en localStorage
+      localStorage.setItem("user", JSON.stringify(response));
+
       // Redirigir a otra página después del inicio de sesión exitoso
       navigate("/");
     } catch (err) {
       setError(err.response.data);
     }
   };
+
+  useEffect(() => {
+    // Leer la información del usuario desde localStorage
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+      navigate("/");
+    }
+  }, [navigate, setUser]);
 
   return (
     <div>

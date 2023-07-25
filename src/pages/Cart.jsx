@@ -3,7 +3,14 @@ import styled from "styled-components";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import { mobile } from "../responsive";
-import React, { useState, useEffect } from "react";
+import React, { useContext, useState } from "react";
+import { CartContext } from "../context/CartContext";
+
+const StickyContainer = styled.div`
+  position: sticky;
+  top: 0;
+  z-index: 100;
+`;
 
 const Container = styled.div``;
 
@@ -26,18 +33,6 @@ const Title = styled.h1`
 
 const TopText = styled.span`
   margin-left: 15px;
-`;
-
-const ButtonAdress = styled.button`
-  background: none;
-  border: none;
-  padding: 10;
-  font-size: inherit;
-  font-family: inherit;
-  color: inherit;
-  font-weight: bold;
-  text-decoration: underline;
-  cursor: pointer;
 `;
 
 const Bottom = styled.div`
@@ -117,7 +112,6 @@ const Summary = styled.div`
   border: 0.5px solid lightgray;
   border-radius: 10px;
   padding: 20px;
-  height: 72vh;
 `;
 
 const SummaryTitle = styled.h1`
@@ -165,16 +159,6 @@ const Button = styled.button`
   transition: all 0.05s ease;
 `;
 
-const ButtonClear = styled.button`
-  border: none;
-  color: red;
-  text-weight: bold;
-  background-color: lightgrey;
-  border-top: 2px solid red;
-  border-bottom: 2px solid red;
-  margin-top: 10px;
-`;
-
 const State = styled.div`
   padding-top: 3px;
   padding-bottom: 3px;
@@ -189,24 +173,13 @@ const StyledAdd = styled(Add)`
 `;
 
 const Cart = () => {
-  const [paymentMethod, setPaymentMethod] = useState("");
-  const [cartItems, setCartItems] = useState([]);
-
-  const handlePaymentChange = (event) => {
-    setPaymentMethod(event.target.value);
-  };
-
-  // const addToCart = (product) => {
-  //   setCartItems((prevCartItems) => [...prevCartItems, product]);
-  //   localStorage.setItem("cartItems", JSON.stringify([...cartItems, product]));
-  // };
-
-  useEffect(() => {
-    const storedCartItems = localStorage.getItem("cartItems");
-    if (storedCartItems) {
-      setCartItems(JSON.parse(storedCartItems));
-    }
-  }, []);
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  const [paymentMethod, setPaymentMethod] = useState("efectivo");
+  const [addressError, setAddressError] = useState("");
+  const [cartError, setCartError] = useState("");
+  const [userError, setUserError] = useState("");
+  const { cartItems, increaseQuantity, decreaseQuantity } =
+    useContext(CartContext);
 
   const calculateSubtotal = () => {
     return cartItems.reduce(
@@ -216,82 +189,67 @@ const Cart = () => {
   };
 
   const calculateTotal = () => {
-    return calculateSubtotal() + 50;
+    return calculateSubtotal() + 150;
   };
 
-  // Función para eliminar todos los elementos del carrito del localStorage
-  const clearCart = () => {
-    // Eliminar el ítem "cartItems" del localStorage
-    localStorage.removeItem("cartItems");
+  const [address, setAddress] = useState("");
 
-    // Actualizar el estado del carrito para que quede vacío
-    setCartItems([]);
+  const handleAddressChange = (e) => {
+    setAddress(e.target.value);
   };
 
-  const increaseQuantity = (productId) => {
-    // Buscar el producto en el carrito con el id proporcionado
-    const productIndex = cartItems.findIndex((item) => item.id === productId);
-
-    if (productIndex !== -1) {
-      // Clonar el arreglo de cartItems para no modificar el estado directamente
-      const updatedCartItems = [...cartItems];
-
-      // Aumentar la cantidad del producto en 1
-      updatedCartItems[productIndex].quantity += 1;
-
-      // Actualizar el estado del carrito con la nueva cantidad del producto
-      setCartItems(updatedCartItems);
-
-      // Actualizar el localStorage para reflejar los cambios
-      localStorage.setItem("cartItems", JSON.stringify(updatedCartItems));
+  const handleCheckout = () => {
+    if (!storedUser) {
+      setUserError("Debe iniciar sesión para continuar.");
+      return;
     }
-  };
 
-  const decreaseQuantity = (productId) => {
-    // Buscar el producto en el carrito con el id proporcionado
-    const productIndex = cartItems.findIndex((item) => item.id === productId);
-
-    if (productIndex !== -1) {
-      // Clonar el arreglo de cartItems para no modificar el estado directamente
-      const updatedCartItems = [...cartItems];
-
-      // Disminuir la cantidad del producto en 1
-      updatedCartItems[productIndex].quantity -= 1;
-
-      // Si la cantidad del producto llega a 0, eliminar completamente el producto del carrito
-      if (updatedCartItems[productIndex].quantity === 0) {
-        updatedCartItems.splice(productIndex, 1);
-
-        // Verificar si el carrito está vacío y recargar la página
-        if (updatedCartItems.length === 0) {
-          setCartItems([]); // Actualizamos el carrito con un arreglo vacío
-          localStorage.removeItem("cartItems");
-          window.location.reload(); // Recargar la página
-          return;
-        }
-      }
-
-      // Actualizar el estado del carrito con los cambios realizados
-      setCartItems(updatedCartItems);
-
-      // Actualizar el localStorage para reflejar los cambios
-      localStorage.setItem("cartItems", JSON.stringify(updatedCartItems));
+    if (cartItems.length === 0) {
+      setCartError("Debe agregar al menos un producto al carrito.");
+      return;
     }
+
+    if (!address.trim()) {
+      setAddressError("La dirección es obligatoria.");
+      return;
+    }
+
+    console.log("----- ORDER SUMMARY -----");
+    console.log("Usuario:", storedUser.nombre);
+    console.log("Telefono:", storedUser.telefono);
+    console.log("Direccion:", address);
+    console.log("Metodo de pago:", paymentMethod);
+
+    console.log("----- ITEMS IN CART -----");
+    cartItems.forEach((item) => {
+      console.log("Titulo:", item.titulo);
+      console.log("Cantidad:", item.quantity);
+      console.log("Total:", item.precio * item.quantity);
+    });
+
+    console.log("----- ORDER TOTAL -----");
+    console.log("Subtotal:", calculateSubtotal());
+    console.log("Envio: $150");
+    console.log("Total:", calculateTotal());
   };
 
-  const calculateTotalQuantity = () => {
-    return cartItems.reduce((total, item) => total + item.quantity, 0);
+  const handlePaymentMethodChange = (e) => {
+    setPaymentMethod(e.target.value);
   };
 
   return (
     <Container>
-      <Navbar />
+      <StickyContainer>
+        <Navbar />
+      </StickyContainer>
       <Wrapper>
         <Title>TU COMPRA</Title>
         <Bottom>
           <Info>
             <TopText>
-              CARRITO: ({calculateTotalQuantity()} productos en total)
+              CARRITO: (
+              {cartItems.reduce((total, item) => total + item.quantity, 0)}{" "}
+              productos en total)
             </TopText>
             {cartItems.map((item) => (
               <Product key={item.id}>
@@ -326,45 +284,45 @@ const Cart = () => {
             </SummaryItem>
             <SummaryItem>
               <SummaryItemText>Envio</SummaryItemText>
-              <SummaryItemPrice>$50</SummaryItemPrice>
+              <SummaryItemPrice>$150</SummaryItemPrice>
             </SummaryItem>
             <SummaryItem>
               <SummaryItemText>Total</SummaryItemText>
-              <SummaryItemPrice>${calculateTotal()}</SummaryItemPrice>
+              <SummaryItemPrice>
+                <b>${calculateTotal()}</b>
+              </SummaryItemPrice>
             </SummaryItem>
-            <label
-              htmlFor="payment"
-              style={{
-                fontWeight: "bold",
-                margintop: "10px",
-                marginbottom: "10px",
-              }}
-            >
-              Método de Pago:
-            </label>
-            &nbsp;&nbsp;
-            <select
-              id="payment"
-              value={paymentMethod}
-              onChange={handlePaymentChange}
-            >
-              <option value="efectivo">Efectivo</option>
-            </select>
             <State>
-              <b>Direccion:</b> Calle falsa 312
-              <ButtonAdress>Cambiar</ButtonAdress>
+              <b>Usuario:</b> {storedUser ? storedUser.nombre : "-"}
             </State>
             <State>
-              <b>Usuario:</b>
+              <b>Telefono:</b> {storedUser ? storedUser.telefono : "-"}
             </State>
             <State>
-              <b>Telefono:</b>
+              <b>Direccion:</b>{" "}
+              <input
+                type="text"
+                value={address}
+                onChange={handleAddressChange}
+                placeholder="Ingrese su direccion"
+              />
             </State>
-            <Button>COMPRAR AHORA</Button>
-            <State>ESTADO PEDIDO: ---</State>
+            <State>
+              <b>Metodo de pago:</b>{" "}
+              <select
+                value={paymentMethod}
+                onChange={handlePaymentMethodChange}
+              >
+                <option value="efectivo">Efectivo</option>
+              </select>
+            </State>
+            <Button onClick={handleCheckout}>CONTINUAR</Button>
+            {userError && <p style={{ color: "red" }}>{userError}</p>}
+            {cartError && <p style={{ color: "red" }}>{cartError}</p>}
+            {addressError && <p style={{ color: "red" }}>{addressError}</p>}
+            <State>ESTADO PEDIDO: -</State>
           </Summary>
         </Bottom>
-        <ButtonClear onClick={clearCart}>Vaciar Carrito</ButtonClear>
       </Wrapper>
       <Footer />
     </Container>

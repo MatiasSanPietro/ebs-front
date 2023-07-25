@@ -15,7 +15,9 @@ const Categories = () => {
   const handleButtonClick = (id) => {
     const sectionElement = document.getElementById(`${id}-section`);
     if (sectionElement) {
-      sectionElement.scrollIntoView({ behavior: "smooth" });
+      const rect = sectionElement.getBoundingClientRect();
+      const offset = rect.top - window.innerHeight / 6;
+      window.scrollBy({ top: offset, behavior: "smooth" });
     }
   };
 

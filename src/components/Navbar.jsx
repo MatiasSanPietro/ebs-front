@@ -1,10 +1,11 @@
 import { Badge } from "@material-ui/core";
 import { ShoppingCartOutlined } from "@material-ui/icons"; //Search
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import styled from "styled-components";
 import { mobile } from "../responsive";
 import { Link } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
+import { CartContext } from "../context/CartContext";
 
 const Container = styled.div`
   height: 65px;
@@ -123,10 +124,21 @@ const Frase = styled.div`
 
 const Navbar = () => {
   const { user, setUser } = useContext(UserContext);
+  const { cartItems } = useContext(CartContext);
+
+  useEffect(() => {
+    // Leer la información del usuario desde localStorage al cargar el componente
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, [setUser]);
 
   const handleLogout = () => {
     // Lógica para cerrar sesión
     setUser(null);
+    // Borrar el usuario de localStorage al cerrar sesión
+    localStorage.removeItem("user");
   };
 
   return (
@@ -153,6 +165,9 @@ const Navbar = () => {
           {user ? (
             <>
               <Username>¡Hola {user.nombre}!</Username>
+              <StyledLinkMenuItem onClick={handleLogout} to="/">
+                CERRAR SESIÓN
+              </StyledLinkMenuItem>
               {user.rol === "admin" && (
                 <>
                   <StyledLinkMenuItemA /*to="/admin"*/>
@@ -160,8 +175,17 @@ const Navbar = () => {
                   </StyledLinkMenuItemA>
                 </>
               )}
-              <StyledLinkMenuItem onClick={handleLogout}>
-                CERRAR SESIÓN
+              <StyledLinkMenuItem to="/Cart">
+                <Badge
+                  overlap="rectangular"
+                  badgeContent={cartItems.reduce(
+                    (total, item) => total + item.quantity,
+                    0
+                  )}
+                  color="secondary"
+                >
+                  <ShoppingCartOutlined />
+                </Badge>
               </StyledLinkMenuItem>
             </>
           ) : (
@@ -174,11 +198,6 @@ const Navbar = () => {
               </StyledLinkMenuItem>
             </>
           )}
-          <StyledLinkMenuItem to="/Cart">
-            <Badge overlap="rectangular" badgeContent={null} color="primary">
-              <ShoppingCartOutlined />
-            </Badge>
-          </StyledLinkMenuItem>
         </Right>
       </Wrapper>
     </Container>

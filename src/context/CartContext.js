@@ -40,17 +40,36 @@ const CartProvider = ({ children }) => {
     );
   };
 
-  // Function to decrease the quantity of a product or remove it if quantity becomes 0
   const decreaseQuantity = (productId) => {
-    setCartItems((prevCartItems) =>
-      prevCartItems
-        .map((item) =>
-          item.id === productId
-            ? { ...item, quantity: item.quantity - 1 }
-            : item
-        )
-        .filter((item) => item.quantity > 0)
-    );
+    // Buscar el producto en el carrito con el id proporcionado
+    const productIndex = cartItems.findIndex((item) => item.id === productId);
+
+    if (productIndex !== -1) {
+      // Clonar el arreglo de cartItems para no modificar el estado directamente
+      const updatedCartItems = [...cartItems];
+
+      // Disminuir la cantidad del producto en 1
+      updatedCartItems[productIndex].quantity -= 1;
+
+      // Si la cantidad del producto llega a 0, eliminar completamente el producto del carrito
+      if (updatedCartItems[productIndex].quantity === 0) {
+        updatedCartItems.splice(productIndex, 1);
+
+        // Verificar si el carrito está vacío y recargar la página
+        if (updatedCartItems.length === 0) {
+          setCartItems([]); // Actualizamos el carrito con un arreglo vacío
+          localStorage.removeItem("cartItems");
+          window.location.reload(); // Recargar la página
+          return;
+        }
+      }
+
+      // Actualizar el estado del carrito con los cambios realizados
+      setCartItems(updatedCartItems);
+
+      // Actualizar el localStorage para reflejar los cambios
+      localStorage.setItem("cartItems", JSON.stringify(updatedCartItems));
+    }
   };
 
   // Function to get the cartItems from localStorage when the component mounts
