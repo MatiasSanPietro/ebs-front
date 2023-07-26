@@ -316,7 +316,7 @@ const Cart = () => {
                 <option value="efectivo">Efectivo</option>
               </select>
             </State>
-            <Button onClick={handleCheckout}>CONTINUAR</Button>
+            <Button onClick={handleCheckout}>ENVIAR PEDIDO</Button>
             {userError && <p style={{ color: "red" }}>{userError}</p>}
             {cartError && <p style={{ color: "red" }}>{cartError}</p>}
             {addressError && <p style={{ color: "red" }}>{addressError}</p>}
