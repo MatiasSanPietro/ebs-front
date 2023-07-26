@@ -1,8 +1,10 @@
 import React from "react";
 import { Button, Table } from "react-bootstrap";
 import styled from "styled-components";
-import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
+import { getAllPedidos, updatePedido } from "../service/order";
+import { useEffect, useState } from "react";
+import OrderModal from "../components/OrderModal";
 
 const Container = styled.div``;
 
@@ -11,21 +13,53 @@ const Space = styled.div`
 `;
 
 const OrderGrid = () => {
-  // Test OrderGrid
-  const products = [
-    {
-      id: 1,
-      usuario_id: 1,
-      fecha_pedido: "2023-07-25",
-      telefono: "Usuario 1",
-      direccion: "Dirección 1",
-      metodo_pago: "Efectivo",
-      nombre_usuario: "Usuario 1",
-      articulos: "Hamburguesa, pizza, agua",
-      total: 100,
-      estado: "Recibido",
-    },
-  ];
+  const [mounted, setMounted] = useState(false);
+  const [pedidos, setPedidos] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedPedido, setSelectedPedido] = useState(null);
+
+  useEffect(() => {
+    setMounted(true);
+
+    Promise.all([getAllPedidos()])
+      .then(([pedidos]) => {
+        setPedidos(pedidos);
+      })
+      .catch((error) => {
+        new Error(error);
+      });
+  }, [mounted]);
+
+  const handleModificar = (pedido) => {
+    setSelectedPedido(pedido);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedPedido(null);
+  };
+
+  const handleSaveChanges = (updatedPedido) => {
+    updatePedido(updatedPedido)
+      .then((res) => {
+        console.log(res);
+        // Llamamos a getAllPedidos nuevamente para obtener la lista actualizada de pedidos
+        getAllPedidos()
+          .then((data) => {
+            // Actualizamos el estado con los nuevos datos de pedidos
+            setPedidos(data);
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    setShowModal(false);
+    setSelectedPedido(null);
+  };
 
   return (
     <Container>
@@ -49,20 +83,23 @@ const OrderGrid = () => {
           </tr>
         </thead>
         <tbody>
-          {products.map((product) => (
-            <tr key={product.id}>
-              <td>{product.id}</td>
-              <td>{product.usuario_id}</td>
-              <td>{product.fecha_pedido}</td>
-              <td>{product.telefono}</td>
-              <td>{product.direccion}</td>
-              <td>{product.metodo_pago}</td>
-              <td>{product.nombre_usuario}</td>
-              <td>{product.articulos}</td>
-              <td>{product.total}</td>
-              <td>{product.estado}</td>
+          {pedidos.map((pedido) => (
+            <tr key={pedido.id}>
+              <td>{pedido.id}</td>
+              <td>{pedido.usuario_id}</td>
+              <td>{pedido.fecha_pedido}</td>
+              <td>{pedido.telefono}</td>
+              <td>{pedido.direccion}</td>
+              <td>{pedido.metodo_pago}</td>
+              <td>{pedido.nombre_usuario}</td>
+              <td>{pedido.articulos}</td>
+              <td>{pedido.total}</td>
+              <td>{pedido.estado}</td>
               <td>
-                <Button href={`/grid/${product.id}`} variant="outline-success">
+                <Button
+                  onClick={() => handleModificar(pedido)}
+                  variant="outline-success"
+                >
                   Editar
                 </Button>
               </td>
@@ -73,35 +110,12 @@ const OrderGrid = () => {
           ))}
         </tbody>
       </Table>
-
-      <h2>Historial de elementos eliminados:</h2>
-      <Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>#P</th>
-            <th>#U</th>
-            <th>Fecha Pedido</th>
-            <th>Telefono</th>
-            <th>Direccion</th>
-            <th>Metodo Pago</th>
-            <th>Nombre Usuario</th>
-            <th>Articulos</th>
-            <th>Total</th>
-            <th>Estado</th>
-          </tr>
-        </thead>
-        <tbody>{/* Render the deleted history data here */}</tbody>
-      </Table>
-
-      {/* Button to clear localStorage */}
-      <Button
-        variant="danger"
-        onClick={() => console.log("Clear localStorage")}
-        style={{ margin: "20px" }}
-      >
-        Borrar Historial de Eliminados
-      </Button>
-      <Footer />
+      <OrderModal
+        pedido={selectedPedido}
+        showModal={showModal}
+        onCloseModal={handleCloseModal}
+        onSaveChanges={handleSaveChanges}
+      />
     </Container>
   );
 };

@@ -3,8 +3,9 @@ import styled from "styled-components";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import { mobile } from "../responsive";
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { CartContext } from "../context/CartContext";
+import { insertPedido, getLastPedidoByUserId } from "../service/order";
 
 const StickyContainer = styled.div`
   position: sticky;
@@ -174,6 +175,7 @@ const StyledAdd = styled(Add)`
 
 const Cart = () => {
   const storedUser = JSON.parse(localStorage.getItem("user"));
+  const [pedidoEstado, setPedidoEstado] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("efectivo");
   const [addressError, setAddressError] = useState("");
   const [cartError, setCartError] = useState("");
@@ -214,28 +216,60 @@ const Cart = () => {
       return;
     }
 
-    console.log("----- ORDER SUMMARY -----");
-    console.log("Usuario:", storedUser.nombre);
-    console.log("Telefono:", storedUser.telefono);
-    console.log("Direccion:", address);
-    console.log("Metodo de pago:", paymentMethod);
+    // Mostrar la alerta de confirmación
+    const isConfirmed = window.confirm("¿Está seguro de enviar el pedido?");
 
-    console.log("----- ITEMS IN CART -----");
-    cartItems.forEach((item) => {
-      console.log("Titulo:", item.titulo);
-      console.log("Cantidad:", item.quantity);
-      console.log("Total:", item.precio * item.quantity);
-    });
+    // Si se confirma la acción, proceder con el envío del pedido
+    if (isConfirmed) {
+      // Crea el objeto de pedido con los datos requeridos
+      const newPedido = {
+        usuario_id: storedUser.id,
+        fecha_pedido: new Date().toISOString(),
+        telefono: storedUser.telefono,
+        direccion: address,
+        metodo_pago: paymentMethod,
+        nombre_usuario: storedUser.nombre,
+        articulos: cartItems
+          .map((item) => `${item.titulo} (${item.quantity})`)
+          .join(", "),
+        total: calculateTotal(),
+        estado: "Estamos recibiendo tu pedido",
+      };
 
-    console.log("----- ORDER TOTAL -----");
-    console.log("Subtotal:", calculateSubtotal());
-    console.log("Envio: $150");
-    console.log("Total:", calculateTotal());
+      // Inserta el nuevo pedido utilizando el servicio insertPedido
+      insertPedido(newPedido)
+        .then((res) => {
+          console.log("Pedido insertado:", res);
+          // Si todo está bien, redirige a la página de grilla de pedidos
+          window.location.href = "/Cart";
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
   };
 
   const handlePaymentMethodChange = (e) => {
     setPaymentMethod(e.target.value);
   };
+
+  useEffect(() => {
+    // Utilizamos useEffect para cargar el estado del último pedido al montar el componente
+    if (storedUser) {
+      getLastPedidoByUserId(storedUser.id)
+        .then((pedido) => {
+          if (pedido && pedido.length > 0) {
+            setPedidoEstado(pedido[0].estado);
+          } else {
+            setPedidoEstado("No se ha realizado un pedido");
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          setPedidoEstado("Error al obtener el estado del pedido");
+        });
+    }
+  }, [storedUser]);
 
   return (
     <Container>
@@ -320,7 +354,9 @@ const Cart = () => {
             {userError && <p style={{ color: "red" }}>{userError}</p>}
             {cartError && <p style={{ color: "red" }}>{cartError}</p>}
             {addressError && <p style={{ color: "red" }}>{addressError}</p>}
-            <State>ESTADO PEDIDO: -</State>
+            <State>
+              <b>ESTADO DE PEDIDO:</b> {pedidoEstado}
+            </State>
           </Summary>
         </Bottom>
       </Wrapper>

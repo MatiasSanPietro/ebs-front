@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button, Table } from "react-bootstrap";
 import { deleteProduct, getAllProducts } from "../service/product";
-import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import styled from "styled-components";
 
@@ -145,7 +144,6 @@ const Grid = () => {
       >
         Borrar Historial de Eliminados
       </Button>
-      <Footer />
     </Container>
   );
 };

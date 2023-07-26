@@ -55,3 +55,15 @@ export const updatePedido = async (body) => {
       console.log(err);
     });
 };
+
+export const getLastPedidoByUserId = async (userId) => {
+  try {
+    const res = await axios.get(
+      `${config.databaseUrl}/api/pedidos/user/${userId}`
+    );
+    return res.data;
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+};
