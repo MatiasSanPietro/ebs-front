@@ -87,10 +87,11 @@ const Linka = styled.a`
 const Login = () => {
   const { setUser } = useContext(UserContext);
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const [loginData, setLoginData] = useState({
     mail: "",
-    contraseña: "",
+    password: "",
   });
 
   const [err, setError] = useState(null);
@@ -108,8 +109,14 @@ const Login = () => {
     if (!loginData.mail.trim()) {
       validationErrors.mail = "El mail es obligatorio.";
     }
-    if (!loginData.contraseña.trim()) {
-      validationErrors.contraseña = "La contraseña es obligatoria.";
+    if (!loginData.password.trim()) {
+      validationErrors.password = "La contraseña es obligatoria.";
+    }
+    if (!loginData.password.trim()) {
+      validationErrors.password = "La contraseña es obligatoria.";
+    } else if (loginData.password.trim().length < 8) {
+      validationErrors.password =
+        "La contraseña debe tener al menos 8 caracteres.";
     }
 
     if (Object.keys(validationErrors).length > 0) {
@@ -118,20 +125,16 @@ const Login = () => {
     }
 
     try {
-      // Llamar a la función loginUser para enviar los datos al backend
+      setIsLoading(true); // Iniciar la solicitud al backend
       const response = await loginUser(loginData);
-
-      // Aquí puedes manejar la respuesta del backend si es necesario
       console.log(response);
       setUser(response);
-
-      // Guardar la información del usuario en localStorage
       localStorage.setItem("user", JSON.stringify(response));
-
-      // Redirigir a otra página después del inicio de sesión exitoso
       navigate("/");
     } catch (err) {
-      setError(err.response.data);
+      setError(err.response.data); // Mostrar la data del error en caso de error
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -160,15 +163,17 @@ const Login = () => {
             />
             <Input
               type="password"
-              name="contraseña"
-              value={loginData.contraseña}
+              name="password"
+              value={loginData.password}
               onChange={handleChange}
               placeholder="CONTRASEÑA"
             />
-            <Button onClick={handleSubmit}>ENTRAR</Button>
-            <p style={{ color: "red" }}>{errors.contraseña}</p>
+            <Button onClick={handleSubmit} disabled={isLoading}>
+              {isLoading ? "Cargando..." : "ENTRAR"}
+            </Button>
+            <p style={{ color: "red" }}>{errors.password}</p>
             {errors.mail && <p style={{ color: "red" }}>{errors.mail}</p>}
-            {err && <p>{err}</p>}
+            {err && <p style={{ color: "red" }}>{err}</p>}
             <Linka>NO RECUERDAS TU CONTRASEÑA?</Linka>
             <Link to="/register">Crear una cuenta</Link>
           </Form>

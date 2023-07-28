@@ -50,6 +50,7 @@ const Button = styled.button`
   position: absolute;
   bottom: 0;
   transition: all 0.1s ease;
+  ${mobile({ height: "8vh" })}
 `;
 
 const Categoryitem = ({ item, onClick }) => {

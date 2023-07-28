@@ -1,6 +1,6 @@
 import { Badge } from "@material-ui/core";
 import { ShoppingCartOutlined } from "@material-ui/icons"; //Search
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
 import { mobile } from "../responsive";
 import { Link } from "react-router-dom";
@@ -9,13 +9,15 @@ import { CartContext } from "../context/CartContext";
 
 const Container = styled.div`
   height: 65px;
-  ${mobile({ height: "50px" })}
-  background-color:  #ededed;
+  background-color: #ededed;
   border-width: 2px;
   border-radius: 1px;
   border-image: linear-gradient orange, white 0, 1 50%;
   box-shadow: 0 0 5px 0px grey;
   padding-bottom: 0px;
+  ${mobile({
+    height: "80px",
+  })}
 `;
 
 const Wrapper = styled.div`
@@ -37,7 +39,7 @@ const Center = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  ${mobile({ flex: 2, justifyContent: "center" })}
+  ${mobile({})}
 `;
 
 const StyledLinkLogo = styled(Link)`
@@ -51,7 +53,10 @@ const StyledLinkLogo = styled(Link)`
   border-width: 2px;
   text-decoration: none;
   font-size: 2rem;
-  ${mobile({ fontSize: "24px" })}
+  ${mobile({
+    fontSize: "24px",
+    margin: "10px",
+  })}
 `;
 
 const Right = styled.div`
@@ -84,7 +89,7 @@ const StyledLinkMenuItem = styled(Link)`
     border-bottom: 2px solid red;
   }
   transition: all 0.05s ease;
-  ${mobile({ fontSize: "12px", marginLeft: "10px" })}
+  ${mobile({ fontSize: "20px", margin: "20px" })}
 `;
 
 const StyledLinkMenuItemA = styled(Link)`
@@ -95,22 +100,8 @@ const StyledLinkMenuItemA = styled(Link)`
   background-color: #ededed;
   border-top: 2px solid red;
   border-bottom: 2px solid red;
-  ${mobile({ fontSize: "12px", marginLeft: "10px" })}
+  ${mobile({ fontSize: "20px", marginLeft: "10px" })}
 `;
-
-// const SearchContainer = styled.div`
-//   border: 0px solid lightgray;
-//   display: flex;
-//   align-items: center;
-//   margin-left: 25px;
-//   margin-right: 2px;
-//   padding: 5px;
-// `;
-
-// const Input = styled.input`
-//   border: none;
-//   ${mobile({ width: "50px" })}
-// `;
 
 const Username = styled.div`
   font-size: 20px;
@@ -120,14 +111,16 @@ const Frase = styled.div`
   padding-left: 20px;
   padding-right: 5px;
   font-size: 20px;
+  ${mobile({ display: "none" })}
 `;
 
 const Navbar = () => {
   const { user, setUser } = useContext(UserContext);
   const { cartItems } = useContext(CartContext);
+  const [showAuthLinks, setShowAuthLinks] = useState(false);
 
   useEffect(() => {
-    // Leer la información del usuario desde localStorage al cargar el componente
+    // Leer la información del usuario desde localStorage
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       setUser(JSON.parse(storedUser));
@@ -135,11 +128,21 @@ const Navbar = () => {
   }, [setUser]);
 
   const handleLogout = () => {
-    // Lógica para cerrar sesión
-    setUser(null);
-    // Borrar el usuario de localStorage al cerrar sesión
-    localStorage.removeItem("user");
+    const isConfirmed = window.confirm(
+      "¿Estás seguro que quieres cerrar la sesión?"
+    );
+    if (isConfirmed) {
+      setUser(null);
+      // Borrar el usuario de localStorage
+      localStorage.removeItem("user");
+    }
   };
+
+  useEffect(() => {
+    const currentHour = new Date().getHours();
+    const isBetweenTimeRange = currentHour >= 12 && currentHour < 20;
+    setShowAuthLinks(isBetweenTimeRange);
+  }, []);
 
   return (
     <Container>
@@ -153,8 +156,13 @@ const Navbar = () => {
           </SearchContainer> */}
           {user && (
             <>
-              <StyledLinkMenuItem to="/grid">GRILLA</StyledLinkMenuItem>
-              <StyledLinkMenuItem to="/orders">PEDIDOS</StyledLinkMenuItem>
+              {/* Mostrar enlaces solo si el usuario es administrador */}
+              {user.rol === "admin" && (
+                <>
+                  <StyledLinkMenuItem to="/grid">GRILLA</StyledLinkMenuItem>
+                  <StyledLinkMenuItem to="/orders">PEDIDOS</StyledLinkMenuItem>
+                </>
+              )}
             </>
           )}
         </Left>
@@ -190,12 +198,20 @@ const Navbar = () => {
             </>
           ) : (
             <>
-              <StyledLinkMenuItem to="/register">
-                REGISTRARSE
-              </StyledLinkMenuItem>
-              <StyledLinkMenuItem to="/login">
-                INICIAR SESION
-              </StyledLinkMenuItem>
+              {showAuthLinks ? (
+                <>
+                  <StyledLinkMenuItem to="/register">
+                    REGISTRARSE
+                  </StyledLinkMenuItem>
+                  <StyledLinkMenuItem to="/login">
+                    INICIAR SESION
+                  </StyledLinkMenuItem>
+                </>
+              ) : (
+                <StyledLinkMenuItemA>
+                  {/* ¡Estamos cerrados! Horario de atencion: 12hs a 20hs */}
+                </StyledLinkMenuItemA>
+              )}
             </>
           )}
         </Right>

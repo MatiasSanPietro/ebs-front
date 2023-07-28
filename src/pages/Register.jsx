@@ -79,7 +79,7 @@ const Register = () => {
   const [inputs, setInputs] = useState({
     nombre: "",
     mail: "",
-    contraseña: "",
+    password: "",
     telefono: "",
   });
   const [errors, setErrors] = useState({});
@@ -102,8 +102,14 @@ const Register = () => {
     if (!inputs.mail.trim()) {
       validationErrors.mail = "El mail es obligatorio.";
     }
-    if (!inputs.contraseña.trim()) {
-      validationErrors.contraseña = "La contraseña es obligatoria.";
+    if (!inputs.password.trim()) {
+      validationErrors.password = "La contraseña es obligatoria.";
+    }
+    if (!inputs.password.trim()) {
+      validationErrors.password = "La contraseña es obligatoria.";
+    } else if (inputs.password.trim().length < 8) {
+      validationErrors.password =
+        "La contraseña debe tener al menos 8 caracteres.";
     }
     if (!inputs.telefono.trim()) {
       validationErrors.telefono = "El telefono es obligatorio.";
@@ -118,6 +124,7 @@ const Register = () => {
       await registerUser(inputs);
       navigate("/login");
     } catch (err) {
+      console.log(err);
       setError(err.response.data);
     }
   };
@@ -153,7 +160,7 @@ const Register = () => {
             <Input
               required
               type="password"
-              name="contraseña"
+              name="password"
               onChange={handleChange}
               placeholder="CONTRASEÑA"
             />
@@ -162,7 +169,7 @@ const Register = () => {
           <p style={{ color: "red" }}>{errors.nombre}</p>
           <p style={{ color: "red" }}>{errors.telefono}</p>
           <p style={{ color: "red" }}>{errors.mail}</p>
-          <p style={{ color: "red" }}>{errors.contraseña}</p>
+          <p style={{ color: "red" }}>{errors.password}</p>
           {err && <p style={{ color: "red" }}>{err}</p>}
           <Link to="/login">Ya tienes una cuenta?</Link>
         </Wrapper>

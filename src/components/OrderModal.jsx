@@ -9,7 +9,6 @@ const OrderModal = ({ pedido, showModal, onCloseModal, onSaveChanges }) => {
   };
 
   const handleSaveChanges = () => {
-    // Asegurarse de que el campo de estado no esté vacío antes de guardar los cambios
     if (estado !== "") {
       onSaveChanges({ ...pedido, estado });
     }
@@ -28,7 +27,6 @@ const OrderModal = ({ pedido, showModal, onCloseModal, onSaveChanges }) => {
             value={estado}
             onChange={handleChangeEstado}
           >
-            <option value="">Elegir estado</option>
             <option value="Estamos recibiendo tu pedido">
               Estamos recibiendo tu pedido
             </option>
@@ -38,10 +36,8 @@ const OrderModal = ({ pedido, showModal, onCloseModal, onSaveChanges }) => {
             <option value="Tu pedido va en camino">
               Tu pedido va en camino
             </option>
-            <option value="Ultimo pedido facturado / Puedes realizar otro pedido">
-              Pedido facturado
-            </option>
             <option value="Pedido cancelado">Pedido cancelado</option>
+            <option value="Facturado">Pedido facturado</option>
           </Form.Control>
         </Form.Group>
       </Modal.Body>

@@ -6,7 +6,7 @@ const Container = styled.div`
   background-color: #ededed;
   display: flex;
   box-shadow: 0 0 5px 0px grey;
-  ${mobile({ flexDirection: "column" })}
+  ${mobile({ display: "none" })}
 `;
 
 const Left = styled.div`
@@ -15,11 +15,16 @@ const Left = styled.div`
   flex-direction: column;
   padding-left: 20px;
   padding-top: 20px;
+  ${mobile({ display: "none" })}
 `;
 
-const Logo = styled.h1``;
+const Logo = styled.h1`
+  ${mobile({ display: "none" })}
+`;
 
-const Desc = styled.p``;
+const Desc = styled.p`
+  ${mobile({ display: "none" })}
+`;
 
 const Center = styled.div`
   flex: 1;
@@ -29,6 +34,7 @@ const Center = styled.div`
 
 const Title = styled.h3`
   margin-bottom: 30px;
+  ${mobile({ display: "none" })}
 `;
 
 const List = styled.ul`
@@ -37,23 +43,26 @@ const List = styled.ul`
   list-style: none;
   display: flex;
   flex-wrap: wrap;
+  ${mobile({ display: "none" })}
 `;
 
 const ListItem = styled.li`
   width: 50%;
   margin-bottom: 10px;
+  ${mobile({ display: "none" })}
 `;
 
 const Right = styled.div`
   flex: 1;
   padding: 20px;
-  ${mobile({ backgroundColor: "#fff8f8" })}
+  ${mobile({ display: "none" })}
 `;
 
 const ContactItem = styled.div`
   margin-bottom: 2px;
   display: flex;
   align-items: center;
+  ${mobile({ display: "none" })}
 `;
 
 const Footer = () => {

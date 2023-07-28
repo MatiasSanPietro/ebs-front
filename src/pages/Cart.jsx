@@ -30,6 +30,7 @@ const Title = styled.h1`
   margin-bottom: 18px;
   border-top: 2px solid red;
   border-bottom: 2px solid red;
+  ${mobile({ display: "none" })}
 `;
 
 const TopText = styled.span`
@@ -41,7 +42,17 @@ const Bottom = styled.div`
   justify-content: space-between;
   box-shadow: 0 0 5px 0px grey;
   background-color: #f0f0f0;
-  padding: 10px;
+  padding: 20px;
+  ${mobile({ flexDirection: "column" })}
+`;
+
+const BottomEstado = styled.div`
+  display: flex;
+  justify-content: space-between;
+  box-shadow: 0 0 5px 0px grey;
+  background-color: #f0f0f0;
+  padding: 5px;
+  border-radius: 10px;
   ${mobile({ flexDirection: "column" })}
 `;
 
@@ -75,9 +86,13 @@ const Details = styled.div`
   justify-content: space-around;
 `;
 
-const ProductName = styled.span``;
+const ProductName = styled.span`
+  font-size: 20px;
+`;
 
-const ProductDescr = styled.span``;
+const ProductDescr = styled.span`
+  font-size: 20px;
+`;
 
 const PriceDetail = styled.div`
   flex: 1;
@@ -92,6 +107,7 @@ const ProductAmountContainer = styled.div`
   align-items: center;
   margin-bottom: 20px;
   margin-right: 200px;
+  ${mobile({ margin: "0px", marginRight: "0px" })}
 `;
 
 const ProductAmount = styled.div`
@@ -104,7 +120,7 @@ const ProductPrice = styled.div`
   font-size: 30px;
   font-weight: 200;
   margin-right: 210px;
-  ${mobile({ marginBottom: "20px" })}
+  ${mobile({ marginBottom: "0px", marginRight: "350px" })}
 `;
 
 const Summary = styled.div`
@@ -113,10 +129,12 @@ const Summary = styled.div`
   border: 0.5px solid lightgray;
   border-radius: 10px;
   padding: 20px;
+  height: 690px;
 `;
 
 const SummaryTitle = styled.h1`
   font-weight: 200;
+  padding-top: 10px;
 `;
 
 const SummaryItem = styled.div`
@@ -127,9 +145,14 @@ const SummaryItem = styled.div`
   font-size: ${(props) => props.type === "total" && "24px"};
 `;
 
-const SummaryItemText = styled.span``;
+const SummaryItemText = styled.span`
+  font-weight: bold;
+  font-size: 18px;
+`;
 
-const SummaryItemPrice = styled.span``;
+const SummaryItemPrice = styled.span`
+  font-size: 24px;
+`;
 
 const Button = styled.button`
   width: 100%;
@@ -176,10 +199,13 @@ const StyledAdd = styled(Add)`
 const Cart = () => {
   const storedUser = JSON.parse(localStorage.getItem("user"));
   const [pedidoEstado, setPedidoEstado] = useState("");
+  const [pedidoDireccion, setPedidoDireccion] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("efectivo");
   const [addressError, setAddressError] = useState("");
   const [cartError, setCartError] = useState("");
   const [userError, setUserError] = useState("");
+  const [selectedOption, setSelectedOption] = useState("address");
+  const [address, setAddress] = useState("");
   const { cartItems, increaseQuantity, decreaseQuantity } =
     useContext(CartContext);
 
@@ -190,11 +216,17 @@ const Cart = () => {
     );
   };
 
-  const calculateTotal = () => {
-    return calculateSubtotal() + 150;
+  const calculateShippingCost = () => {
+    return selectedOption === "address" ? 150 : 0;
   };
 
-  const [address, setAddress] = useState("");
+  const calculateDiscount = () => {
+    return selectedOption === "local" ? calculateSubtotal() * 0.1 : 0;
+  };
+
+  const calculateTotal = () => {
+    return calculateSubtotal() + calculateShippingCost() - calculateDiscount();
+  };
 
   const handleAddressChange = (e) => {
     setAddress(e.target.value);
@@ -215,11 +247,8 @@ const Cart = () => {
       setAddressError("La dirección es obligatoria.");
       return;
     }
+    const isConfirmed = window.confirm("¿Completar pedido y enviar?");
 
-    // Mostrar la alerta de confirmación
-    const isConfirmed = window.confirm("¿Está seguro de enviar el pedido?");
-
-    // Si se confirma la acción, proceder con el envío del pedido
     if (isConfirmed) {
       // Crea el objeto de pedido con los datos requeridos
       const newPedido = {
@@ -240,7 +269,6 @@ const Cart = () => {
       insertPedido(newPedido)
         .then((res) => {
           console.log("Pedido insertado:", res);
-          // Si todo está bien, redirige a la página de grilla de pedidos
           window.location.href = "/Cart";
         })
         .catch((err) => {
@@ -254,7 +282,7 @@ const Cart = () => {
   };
 
   useEffect(() => {
-    // Utilizamos useEffect para cargar el estado del último pedido al montar el componente
+    // Cargar el estado del ultimo pedido
     if (storedUser) {
       getLastPedidoByUserId(storedUser.id)
         .then((pedido) => {
@@ -270,6 +298,41 @@ const Cart = () => {
         });
     }
   }, [storedUser]);
+
+  useEffect(() => {
+    // Cargar el estado del la ultima direccion
+    if (storedUser) {
+      getLastPedidoByUserId(storedUser.id)
+        .then((pedido) => {
+          if (pedido && pedido.length > 0) {
+            setPedidoDireccion(pedido[0].direccion);
+          } else {
+            setPedidoDireccion("-");
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          setPedidoDireccion("Error al obtener la direccion del pedido");
+        });
+    }
+  }, [storedUser]);
+
+  const handleOptionChange = (e) => {
+    setSelectedOption(e.target.value);
+    if (e.target.value === "local") {
+      setAddress("Local");
+    } else {
+      setAddress(""); // Si selecciona "A domicilio" el valor de address se resetea
+    }
+  };
+
+  useEffect(() => {
+    // Limpiar items del carrito despues de 30 minutos
+    const timer = setTimeout(() => {
+      localStorage.removeItem("cartItems");
+    }, 1800000);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <Container>
@@ -311,16 +374,27 @@ const Cart = () => {
             ))}
           </Info>
           <Summary>
+            <BottomEstado>
+              <State>
+                <b>Estado ultimo pedido: </b>
+                {pedidoEstado}
+                <br></br>
+                <b>Para la direccion: </b>
+                {pedidoDireccion}
+                <br></br>
+                {/* <b>Usted tendra su pedido a las: </b> */}
+              </State>
+            </BottomEstado>
             <SummaryTitle>RESUMEN</SummaryTitle>
             <SummaryItem>
-              <SummaryItemText>Subtotal</SummaryItemText>
-              <SummaryItemPrice>${calculateSubtotal()}</SummaryItemPrice>
-            </SummaryItem>
-            <SummaryItem>
               <SummaryItemText>Envio</SummaryItemText>
-              <SummaryItemPrice>$150</SummaryItemPrice>
+              <SummaryItemPrice>${calculateShippingCost()}</SummaryItemPrice>
             </SummaryItem>
             <SummaryItem>
+              <SummaryItemText>Descuento 10%</SummaryItemText>
+              <SummaryItemPrice>-${calculateDiscount()}</SummaryItemPrice>
+            </SummaryItem>
+            <SummaryItem type="total">
               <SummaryItemText>Total</SummaryItemText>
               <SummaryItemPrice>
                 <b>${calculateTotal()}</b>
@@ -333,13 +407,40 @@ const Cart = () => {
               <b>Telefono:</b> {storedUser ? storedUser.telefono : "-"}
             </State>
             <State>
-              <b>Direccion:</b>{" "}
+              <b>Forma de entrega:</b>
+              <br />
               <input
-                type="text"
-                value={address}
-                onChange={handleAddressChange}
-                placeholder="Ingrese su direccion"
-              />
+                type="radio"
+                value="local"
+                checked={selectedOption === "local"}
+                onChange={handleOptionChange}
+              />{" "}
+              Retiro en el local
+              <br />
+              <input
+                type="radio"
+                value="address"
+                checked={selectedOption === "address"}
+                onChange={handleOptionChange}
+              />{" "}
+              A domicilio
+            </State>
+            <State>
+              {selectedOption === "address" ? (
+                <>
+                  <b>Direccion:</b>{" "}
+                  <input
+                    type="text"
+                    value={address}
+                    onChange={handleAddressChange}
+                    placeholder="Ingrese su direccion"
+                  />
+                </>
+              ) : (
+                <>
+                  <b>Retiro en el local</b>
+                </>
+              )}
             </State>
             <State>
               <b>Metodo de pago:</b>{" "}
@@ -354,9 +455,6 @@ const Cart = () => {
             {userError && <p style={{ color: "red" }}>{userError}</p>}
             {cartError && <p style={{ color: "red" }}>{cartError}</p>}
             {addressError && <p style={{ color: "red" }}>{addressError}</p>}
-            <State>
-              <b>ESTADO DE PEDIDO:</b> {pedidoEstado}
-            </State>
           </Summary>
         </Bottom>
       </Wrapper>

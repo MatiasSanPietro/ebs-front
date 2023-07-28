@@ -79,13 +79,18 @@ const Button = styled.button`
 const Productitem = ({ item }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const { addToCart } = useContext(CartContext);
+  const storedUser = JSON.parse(localStorage.getItem("user"));
 
   const handleImageClick = () => {
     setIsExpanded(!isExpanded);
   };
 
   const handleAddToCart = () => {
-    addToCart(item);
+    if (storedUser) {
+      addToCart(item);
+    } else {
+      alert("Debes iniciar sesión para agregar productos al carrito.");
+    }
   };
 
   return (
