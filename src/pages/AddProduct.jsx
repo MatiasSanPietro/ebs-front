@@ -27,13 +27,6 @@ const AddProduct = () => {
     });
   };
 
-  const handleChange1 = (name, value) => {
-    setData({
-      ...data,
-      [name]: value,
-    });
-  };
-
   const onSubmit = (e) => {
     e.preventDefault();
     insertProduct(data);
@@ -98,6 +91,7 @@ const AddProduct = () => {
               <option value="bebida sin alcohol">Bebida sin alcohol</option>
               <option value="bebida con alcohol">Bebida con alcohol</option>
               <option value="promo">Promo</option>
+              <option value="INACTIVO">INACTIVO</option>
             </Form.Select>
           </Form.Group>
           <Form.Group className="mb-3" controlId="formBasicEmail">
@@ -105,7 +99,7 @@ const AddProduct = () => {
             <Form.Select
               name="rubro_secundario"
               value={rubro_secundario}
-              onChange={(e) => handleChange1(e.target.name, e.target.value)}
+              onChange={(e) => handleChange(e.target.name, e.target.value)}
             >
               <option value="">Elegir rubro secundario</option>
               <option value="hamburguesa">Hamburguesa</option>

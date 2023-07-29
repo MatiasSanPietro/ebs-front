@@ -5,7 +5,7 @@ import Navbar from "../components/Navbar";
 import { mobile } from "../responsive";
 import React, { useContext, useState, useEffect } from "react";
 import { CartContext } from "../context/CartContext";
-import { insertPedido, getLastPedidoByUserId } from "../service/order";
+import { insertPedido, getPedidoByUserId } from "../service/order";
 
 const StickyContainer = styled.div`
   position: sticky;
@@ -247,34 +247,31 @@ const Cart = () => {
       setAddressError("La dirección es obligatoria.");
       return;
     }
-    const isConfirmed = window.confirm("¿Completar pedido y enviar?");
 
-    if (isConfirmed) {
-      // Crea el objeto de pedido con los datos requeridos
-      const newPedido = {
-        usuario_id: storedUser.id,
-        fecha_pedido: new Date().toISOString(),
-        telefono: storedUser.telefono,
-        direccion: address,
-        metodo_pago: paymentMethod,
-        nombre_usuario: storedUser.nombre,
-        articulos: cartItems
-          .map((item) => `${item.titulo} (${item.quantity})`)
-          .join(", "),
-        total: calculateTotal(),
-        estado: "Estamos recibiendo tu pedido",
-      };
+    // Crea el objeto de pedido con los datos requeridos
+    const newPedido = {
+      usuario_id: storedUser.id,
+      fecha_pedido: new Date().toISOString(),
+      telefono: storedUser.telefono,
+      direccion: address,
+      metodo_pago: paymentMethod,
+      nombre_usuario: storedUser.nombre,
+      articulos: cartItems
+        .map((item) => `${item.titulo} (${item.quantity})`)
+        .join(", "),
+      total: calculateTotal(),
+      estado: "Estamos recibiendo tu pedido",
+    };
 
-      // Inserta el nuevo pedido utilizando el servicio insertPedido
-      insertPedido(newPedido)
-        .then((res) => {
-          console.log("Pedido insertado:", res);
-          window.location.href = "/Cart";
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
+    // Inserta el nuevo pedido utilizando el servicio insertPedido
+    insertPedido(newPedido)
+      .then((res) => {
+        console.log("Pedido insertado:", res);
+        window.location.href = "/Cart";
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   const handlePaymentMethodChange = (e) => {
@@ -282,37 +279,21 @@ const Cart = () => {
   };
 
   useEffect(() => {
-    // Cargar el estado del ultimo pedido
     if (storedUser) {
-      getLastPedidoByUserId(storedUser.id)
+      getPedidoByUserId(storedUser.id)
         .then((pedido) => {
           if (pedido && pedido.length > 0) {
             setPedidoEstado(pedido[0].estado);
+            setPedidoDireccion(pedido[0].direccion);
           } else {
             setPedidoEstado("No se ha realizado un pedido");
+            setPedidoDireccion("No se ha proporcionado una dirección");
           }
         })
         .catch((err) => {
           console.log(err);
           setPedidoEstado("Error al obtener el estado del pedido");
-        });
-    }
-  }, [storedUser]);
-
-  useEffect(() => {
-    // Cargar el estado del la ultima direccion
-    if (storedUser) {
-      getLastPedidoByUserId(storedUser.id)
-        .then((pedido) => {
-          if (pedido && pedido.length > 0) {
-            setPedidoDireccion(pedido[0].direccion);
-          } else {
-            setPedidoDireccion("-");
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-          setPedidoDireccion("Error al obtener la direccion del pedido");
+          setPedidoDireccion("Error al obtener la dirección del pedido");
         });
     }
   }, [storedUser]);
@@ -326,13 +307,13 @@ const Cart = () => {
     }
   };
 
-  useEffect(() => {
-    // Limpiar items del carrito despues de 30 minutos
-    const timer = setTimeout(() => {
-      localStorage.removeItem("cartItems");
-    }, 1800000);
-    return () => clearTimeout(timer);
-  }, []);
+  // useEffect(() => {
+  //   // Limpiar items del carrito despues de 30 minutos
+  //   const timer = setTimeout(() => {
+  //     localStorage.removeItem("cartItems");
+  //   }, 1800000);
+  //   return () => clearTimeout(timer);
+  // }, []);
 
   return (
     <Container>
@@ -382,7 +363,6 @@ const Cart = () => {
                 <b>Para la direccion: </b>
                 {pedidoDireccion}
                 <br></br>
-                {/* <b>Usted tendra su pedido a las: </b> */}
               </State>
             </BottomEstado>
             <SummaryTitle>RESUMEN</SummaryTitle>

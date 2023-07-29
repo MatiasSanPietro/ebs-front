@@ -56,7 +56,7 @@ export const updatePedido = async (body) => {
     });
 };
 
-export const getLastPedidoByUserId = async (userId) => {
+export const getPedidoByUserId = async (userId) => {
   try {
     const res = await axios.get(
       `${config.databaseUrl}/api/pedidos/user/${userId}`

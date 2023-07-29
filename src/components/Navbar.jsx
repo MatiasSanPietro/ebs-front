@@ -128,19 +128,19 @@ const Navbar = () => {
   }, [setUser]);
 
   const handleLogout = () => {
-    const isConfirmed = window.confirm(
-      "¿Estás seguro que quieres cerrar la sesión?"
-    );
-    if (isConfirmed) {
-      setUser(null);
-      // Borrar el usuario de localStorage
-      localStorage.removeItem("user");
-    }
+    // const isConfirmed = window.confirm(
+    //   "¿Estás seguro que quieres cerrar la sesión?"
+    // );
+    // if (isConfirmed) {
+    setUser(null);
+    // Borrar el usuario de localStorage
+    localStorage.removeItem("user");
+    // }
   };
 
   useEffect(() => {
     const currentHour = new Date().getHours();
-    const isBetweenTimeRange = currentHour >= 12 && currentHour < 20;
+    const isBetweenTimeRange = currentHour >= 0 && currentHour < 23;
     setShowAuthLinks(isBetweenTimeRange);
   }, []);
 

@@ -124,6 +124,7 @@ const EditProduct = () => {
               <option value="comida">Comida</option>
               <option value="bebida">Bebida</option>
               <option value="promo">Promo</option>
+              <option value="inactivo">INACTIVO</option>
             </Form.Select>
           </Form.Group>
           <Form.Group className="mb-3" controlId="formBasicEmail">
