@@ -129,7 +129,7 @@ const Summary = styled.div`
   border: 0.5px solid lightgray;
   border-radius: 10px;
   padding: 20px;
-  height: 690px;
+  height: 757px;
 `;
 
 const SummaryTitle = styled.h1`
@@ -200,6 +200,8 @@ const Cart = () => {
   const storedUser = JSON.parse(localStorage.getItem("user"));
   const [pedidoEstado, setPedidoEstado] = useState("");
   const [pedidoDireccion, setPedidoDireccion] = useState("");
+  const [pedidoArticulos, setPedidoArticulos] = useState("");
+  const [pedidoTotal, setPedidoTotal] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("efectivo");
   const [addressError, setAddressError] = useState("");
   const [cartError, setCartError] = useState("");
@@ -285,15 +287,21 @@ const Cart = () => {
           if (pedido && pedido.length > 0) {
             setPedidoEstado(pedido[0].estado);
             setPedidoDireccion(pedido[0].direccion);
+            setPedidoArticulos(pedido[0].articulos);
+            setPedidoTotal(pedido[0].total);
           } else {
             setPedidoEstado("No se ha realizado un pedido");
             setPedidoDireccion("No se ha proporcionado una dirección");
+            setPedidoArticulos("-");
+            setPedidoTotal("-");
           }
         })
         .catch((err) => {
           console.log(err);
           setPedidoEstado("Error al obtener el estado del pedido");
           setPedidoDireccion("Error al obtener la dirección del pedido");
+          setPedidoArticulos("Error al obtener los articulos");
+          setPedidoTotal("Error al obtener el total");
         });
     }
   }, [storedUser]);
@@ -362,6 +370,12 @@ const Cart = () => {
                 <br></br>
                 <b>Para la direccion: </b>
                 {pedidoDireccion}
+                <br></br>
+                <b>Articulos: </b>
+                {pedidoArticulos}
+                <br></br>
+                <b>Total: $</b>
+                {pedidoTotal}
                 <br></br>
               </State>
             </BottomEstado>

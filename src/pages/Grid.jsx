@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from "react"; //useContext
+import React, { useEffect, useState } from "react";
 import { Button, Table } from "react-bootstrap";
-import { deleteProduct, getAllProducts } from "../service/product";
+import { getAllProducts } from "../service/product"; //deleteProduct
 import Navbar from "../components/Navbar";
 import styled from "styled-components";
-// import { UserContext } from "../context/UserContext";
-// import { format } from "date-fns";
 
 const StyledImg = styled.img`
   width: 50px;
@@ -48,7 +46,7 @@ const Grid = () => {
           "comida",
           "bebida sin alcohol",
           "bebida con alcohol",
-          "inactivo",
+          "INACTIVO",
         ];
         const sortedProducts = products.sort((a, b) => {
           return rubroOrder.indexOf(a.rubro) - rubroOrder.indexOf(b.rubro);
@@ -61,23 +59,18 @@ const Grid = () => {
   }, [mounted]);
 
   const estadoColors = {
-    inactivo: "red",
+    INACTIVO: "red",
   };
 
-  const handleDeleteProduct = (id) => {
-    // const isConfirmed = window.confirm(
-    //   "¿Estás seguro que quieres eliminar este producto?"
-    // );
-    // if (isConfirmed) {
-    deleteProduct(id)
-      .then((response) => {
-        console.log("Producto eliminado:", response);
-      })
-      .catch((error) => {
-        console.log("Error al eliminar el producto:", error);
-      });
-    // }
-  };
+  // const handleDeleteProduct = (id) => {
+  //   deleteProduct(id)
+  //     .then((response) => {
+  //       console.log("Producto eliminado:", response);
+  //     })
+  //     .catch((error) => {
+  //       console.log("Error al eliminar el producto:", error);
+  //     });
+  // };
 
   return (
     <Container>
@@ -104,6 +97,7 @@ const Grid = () => {
               <th>Imagen</th>
               <th>Rubro</th>
               <th>Rubro sec</th>
+              <th>Ingredientes</th>
               <th>Modificar</th>
               <th>Eliminar</th>
             </tr>
@@ -121,6 +115,7 @@ const Grid = () => {
                   </td>
                   <td style={{ color: estadoColors[e.rubro] }}>{e.rubro}</td>
                   <td>{e.rubro_secundario}</td>
+                  <td>{e.ingrediente}</td>
                   <td>
                     <Button href={`/grid/${e.id}`} variant="outline-success">
                       Editar
@@ -129,7 +124,7 @@ const Grid = () => {
                   <td>
                     <Button
                       variant="outline-danger"
-                      onClick={() => handleDeleteProduct(e.id)}
+                      // onClick={() => handleDeleteProduct(e.id)}
                     >
                       Eliminar
                     </Button>

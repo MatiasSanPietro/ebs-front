@@ -18,6 +18,7 @@ const AddProduct = () => {
     rubro: "",
     titulo: "",
     rubro_secundario: "",
+    ingrediente: "",
   });
 
   const handleChange = (name, value) => {
@@ -33,7 +34,15 @@ const AddProduct = () => {
     window.location.href = "/grid";
   };
 
-  const { imagen, descr, precio, rubro, titulo, rubro_secundario } = data;
+  const {
+    imagen,
+    descr,
+    precio,
+    rubro,
+    titulo,
+    rubro_secundario,
+    ingrediente,
+  } = data;
 
   return (
     <Container className="mt-3">
@@ -114,6 +123,16 @@ const AddProduct = () => {
               <option value="agua saborizada">Agua saborizada</option>
               <option value="gaseosa">Gaseosa</option>
             </Form.Select>
+          </Form.Group>
+          <Form.Group className="mb-3" controlId="formBasicEmail">
+            <Form.Label>Ingredientes</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Insertar ingrediente"
+              name="ingrediente"
+              value={ingrediente}
+              onChange={(e) => handleChange(e.target.name, e.target.value)}
+            />
           </Form.Group>
           <Button variant="primary" type="submit" className="mb-3">
             Enviar

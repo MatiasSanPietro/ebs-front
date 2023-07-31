@@ -17,14 +17,23 @@ const EditProduct = () => {
   const [mounted, setMounted] = useState(false);
   const [data, setData] = useState({
     id: "",
-    imagen: "",
+    titulo: "",
     descr: "",
     precio: "",
+    imagen: "",
     rubro: "",
-    titulo: "",
     rubro_secundario: "",
+    ingrediente: "",
   });
-  const { imagen, descr, precio, rubro, titulo, rubro_secundario } = data;
+  const {
+    titulo,
+    descr,
+    precio,
+    imagen,
+    rubro,
+    rubro_secundario,
+    ingrediente,
+  } = data;
 
   const handleChange = (name, value) => {
     setData({
@@ -51,16 +60,25 @@ const EditProduct = () => {
 
     Promise.all([getProductById(idProduct)])
       .then(([product]) => {
-        const { id, imagen, descr, precio, rubro, titulo, rubro_secundario } =
-          product[0];
-        setData({
+        const {
           id,
-          imagen,
+          titulo,
           descr,
           precio,
+          imagen,
           rubro,
-          titulo,
           rubro_secundario,
+          ingrediente,
+        } = product[0];
+        setData({
+          id,
+          titulo,
+          descr,
+          precio,
+          imagen,
+          rubro,
+          rubro_secundario,
+          ingrediente,
         });
       })
       .catch((error) => {
@@ -147,6 +165,16 @@ const EditProduct = () => {
               <option value="agua saborizada">Agua saborizada</option>
               <option value="gaseosa">Gaseosa</option>
             </Form.Select>
+          </Form.Group>
+          <Form.Group className="mb-3" controlId="formBasicEmail">
+            <Form.Label>Ingredientes</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Insertar ingrediente"
+              name="ingrediente"
+              value={ingrediente}
+              onChange={(e) => handleChange(e.target.name, e.target.value)}
+            />
           </Form.Group>
           <Button variant="primary" type="submit" className="mb-3">
             Enviar
