@@ -1,7 +1,34 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Container, Form } from "react-bootstrap";
 import { insertProduct } from "../service/product";
 import styled from "styled-components";
+import { getAllArticuloinsumos } from "../service/articuloinsumo";
+import { Getarticuloinsumodetallebyarticuloinsumoid } from "../service/articuloinsumodetalle";
+
+const BottomEstado = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`;
+
+const Label = styled.label`
+  margin-bottom: 0.5rem;
+`;
+
+const Select = styled.select`
+  width: 100%;
+  padding: 0.5rem;
+`;
+
+const Input = styled.input`
+  width: 100%;
+  padding: 0.5rem;
+`;
+
+const Textarea = styled.textarea`
+  width: 100%;
+  padding: 0.5rem;
+`;
 
 const Wrapper = styled.div`
   margin-top: 50px;
@@ -44,9 +71,160 @@ const AddProduct = () => {
     ingrediente,
   } = data;
 
+  const handleAgregar = () => {
+    if (copiedIngredients.length > 0) {
+      const ingredientsString = copiedIngredients.join(" / ");
+      handleChange("ingrediente", ingredientsString);
+    }
+  };
+
+  const [articuloinsumos, setArticuloinsumos] = useState([]);
+  const [selectedArticulo, setSelectedArticulo] = useState(null);
+  const [articuloinsumoDetalle, setArticuloInsumoDetalle] = useState([]);
+  const [selectedDetalle, setSelectedDetalle] = useState("");
+  const [ingredientString, setIngredientString] = useState("");
+  const [copiedIngredients, setCopiedIngredients] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetchArticuloinsumos();
+  }, []);
+
+  useEffect(() => {
+    if (selectedArticulo) {
+      setLoading(true);
+      fetchArticuloInsumoDetalle(selectedArticulo.id);
+    }
+  }, [selectedArticulo]);
+
+  useEffect(() => {
+    if (selectedArticulo && articuloinsumoDetalle.length > 0) {
+      const ingredient = `${selectedArticulo.nombre} - ${
+        selectedArticulo.unidad_medida
+      }, ${
+        selectedDetalle === "Seleccionar cantidad"
+          ? "Seleccione cantidad"
+          : selectedDetalle
+      }`;
+      setIngredientString(ingredient);
+    }
+  }, [selectedArticulo, articuloinsumoDetalle, selectedDetalle]);
+
+  const fetchArticuloinsumos = async () => {
+    try {
+      const data = await getAllArticuloinsumos();
+      setArticuloinsumos(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchArticuloInsumoDetalle = async (articuloinsumoId) => {
+    try {
+      const data = await Getarticuloinsumodetallebyarticuloinsumoid(
+        articuloinsumoId
+      );
+      setArticuloInsumoDetalle(data);
+      setSelectedDetalle("Seleccionar detalle");
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    }
+  };
+
+  const handleSelectChange = (event) => {
+    const selectedId = event.target.value;
+    const selected = articuloinsumos.find(
+      (articuloinsumo) => articuloinsumo.id === parseInt(selectedId)
+    );
+    setSelectedArticulo(selected);
+  };
+
+  const handleDetalleChange = (event) => {
+    setSelectedDetalle(event.target.value);
+  };
+
+  const handleAgregarIngrediente = () => {
+    if (selectedArticulo && selectedDetalle !== "Seleccionar cantidad") {
+      const ingredient = `${selectedArticulo.nombre} - ${selectedDetalle} ${selectedArticulo.unidad_medida}`;
+      setCopiedIngredients([...copiedIngredients, ingredient]);
+      setSelectedDetalle("Seleccionar cantidad");
+    }
+  };
+
+  const detalleOptions = articuloinsumoDetalle.map((detalle) => (
+    <option key={detalle.id} value={detalle.cantidad}>
+      {detalle.cantidad}
+    </option>
+  ));
+
   return (
     <Container className="mt-3">
       <Wrapper>
+        <BottomEstado>
+          <Label htmlFor="articuloinsumo">Articulo Insumo:</Label>
+          <Select
+            id="articuloinsumo"
+            value={selectedArticulo ? selectedArticulo.id : ""}
+            onChange={handleSelectChange}
+          >
+            <option value="">Seleccione un artículo insumo</option>
+            {articuloinsumos.map((articuloinsumo) => (
+              <option key={articuloinsumo.id} value={articuloinsumo.id}>
+                {articuloinsumo.nombre} - {articuloinsumo.unidad_medida}
+              </option>
+            ))}
+          </Select>
+
+          {loading ? (
+            <p>Cargando detalle...</p>
+          ) : (
+            <div>
+              {articuloinsumoDetalle.length > 0 && (
+                <div>
+                  <Label htmlFor="detalle">Cantidad:</Label>
+                  <Select
+                    id="detalle"
+                    value={selectedDetalle}
+                    onChange={handleDetalleChange}
+                  >
+                    <option value="Seleccionar cantidad">
+                      Seleccionar cantidad
+                    </option>
+                    {detalleOptions}
+                  </Select>
+                </div>
+              )}
+            </div>
+          )}
+
+          <div>
+            {/* <Label htmlFor="ingredientString">
+              Ingredientes seleccionados:
+            </Label>
+            <Input
+              type="text"
+              id="ingredientString"
+              value={ingredientString}
+              readOnly
+            /> */}
+            <Button onClick={handleAgregarIngrediente}>
+              Agregar Ingrediente
+            </Button>
+          </div>
+
+          <div>
+            <Label htmlFor="copiedIngredients">Ingredientes:</Label>
+            <Textarea
+              id="copiedIngredients"
+              value={copiedIngredients.join(" / ")}
+              onChange={(e) =>
+                setCopiedIngredients(e.target.value.split(" / "))
+              }
+            />
+          </div>
+        </BottomEstado>
         <Form onSubmit={(e) => onSubmit(e)}>
           <Form.Group className="mb-3" controlId="formBasicEmail">
             <Form.Label>Nombre</Form.Label>
@@ -134,6 +312,11 @@ const AddProduct = () => {
               onChange={(e) => handleChange(e.target.name, e.target.value)}
             />
           </Form.Group>
+          <Button variant="secondary" onClick={handleAgregar}>
+            Bloquear ingredientes
+          </Button>
+          <br></br>
+          <br></br>
           <Button variant="primary" type="submit" className="mb-3">
             Enviar
           </Button>

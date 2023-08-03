@@ -140,9 +140,10 @@ const EditProduct = () => {
             >
               <option value="">Elegir rubro</option>
               <option value="comida">Comida</option>
-              <option value="bebida">Bebida</option>
+              <option value="bebida sin alcohol">Bebida sin alcohol</option>
+              <option value="bebida con alcohol">Bebida con alcohol</option>
               <option value="promo">Promo</option>
-              <option value="inactivo">INACTIVO</option>
+              <option value="INACTIVO">INACTIVO</option>
             </Form.Select>
           </Form.Group>
           <Form.Group className="mb-3" controlId="formBasicEmail">
